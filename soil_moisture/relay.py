@@ -1,46 +1,26 @@
-import time
-from counterfit_connection import CounterFitConnection
-from counterfit_shims_grove.grove_relay import GroveRelay
+import time, json
 
-from soil_moisture.cloud import IoTHub
+global grove_relay
 
-CounterFitConnection.init('127.0.0.1', 5000)
+def handle_telemetry(topic, payload, dup, qos, retain):
+    global grove_relay
 
-TOPIC = 'counterfit/relay'
-CERTIFICATES_DIR = "certs_test2"
-ENDPOINT = "a1zavzvofzdchy-ats.iot.ap-southeast-1.amazonaws.com"
-CLIENT_ID = "test2_device"
-PATH_TO_CERTIFICATE = "certs_test2/test2-certificate.pem.crt"
-PATH_TO_PRIVATE_KEY = "certs_test2/test2-private.pem.key"
-PATH_TO_AMAZON_ROOT_CA_1 = "certs_test2/AmazonRootCA1.pem"
-iot_hub = IoTHub(
-    endpoint=ENDPOINT,
-    client_id=CLIENT_ID,
-    cert_path=PATH_TO_CERTIFICATE,
-    private_key_path=PATH_TO_PRIVATE_KEY,
-    root_ca_path=PATH_TO_AMAZON_ROOT_CA_1
-)
+    message = json.loads(payload)
+    print(f"Received message {message} from topic {topic}")
 
-iot_hub.connect()
-iot_hub.subscribe_cloud(TOPIC)
+    relay_on = message['relay']
 
-relay = GroveRelay(5)
-count = 0
-while count<10:
-    relay_on = False
+    if relay_on:
+        grove_relay.on()
+    else:
+        grove_relay.off()
 
-    # print("Soil moisture:", soil_moisture)
 
-    # if soil_moisture > 450:
-    #     relay_on = True
-    #     telemetry = json.dumps({'relay_on' : relay_on})
-    #     # mqtt_client.publish(client_telemetry_topic, telemetry)
-    # else:
-    #     relay_on = False
-    #     telemetry = json.dumps({'relay_on' : relay_on})
-    #     # mqtt_client.publish(client_telemetry_topic, telemetry)
+def relay_thread(iot_hub, sub_topic, relay):
+    global grove_relay
+    grove_relay = relay
 
-    time.sleep(5)
-    count += 1
+    iot_hub.subscribe_cloud(sub_topic=sub_topic, on_message_handle=handle_telemetry)
 
-iot_hub.disconnect()
+    while True:
+        time.sleep(2)

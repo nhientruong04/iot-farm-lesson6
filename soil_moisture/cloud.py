@@ -6,19 +6,6 @@ from awsiot import mqtt_connection_builder
 import time as t
 import json
 
-
-def handle_telemetry(topic, payload, dup, qos, retain, **kwargs):
-    print(f"Received message from topic {topic}")
-    print(f"Received payload {payload}")
-    # payload = json.loads(message.payload.decode())
-    # relay_on = payload['relay_on']
-    # print("Message received:", relay_on)
-
-    # if relay_on:
-    #     relay.on()
-    # else:
-    #     relay.off()
-
 class IoTHub():
 	def __init__(self, endpoint, client_id, cert_path, private_key_path, root_ca_path):
 		self.event_loop_group = io.EventLoopGroup(1)
@@ -35,18 +22,16 @@ class IoTHub():
 				keep_alive_secs=5
 		)
 
-	def subscribe_cloud(self, sub_topic):
+	def subscribe_cloud(self, sub_topic, on_message_handle):
 		self.subscribe_future, _ =  self.mqtt_connection.subscribe(
 										topic=sub_topic,
 										qos=mqtt.QoS.AT_LEAST_ONCE,
-										callback=handle_telemetry)
+										callback=on_message_handle)
+		print(f"Subscribed to topic {sub_topic}.")
 
 		return self.subscribe_future.result()
 
 	def publish_cloud(self, payload, topic):
-		# Make the connect() call
-		
-		# Future.result() waits until a result is available
 		self.mqtt_connection.publish(topic=topic, payload=json.dumps(payload), qos=mqtt.QoS.AT_LEAST_ONCE)
 		print("Published: '" + json.dumps(payload) + "' to the topic: " + topic)
 
