@@ -17,12 +17,17 @@ CounterFitConnection.init('127.0.0.1', 5000)
 
 PUB_TOPIC = 'counterfit/sensor'
 SUB_TOPIC = 'counterfit/relay'
-CERTIFICATES_DIR = "certs_test2"
 ENDPOINT = "a1zavzvofzdchy-ats.iot.ap-southeast-1.amazonaws.com"
-CLIENT_ID = "test2_device"
-PATH_TO_CERTIFICATE = "certs_test2/test2-certificate.pem.crt"
-PATH_TO_PRIVATE_KEY = "certs_test2/test2-private.pem.key"
-PATH_TO_AMAZON_ROOT_CA_1 = "certs_test2/AmazonRootCA1.pem"
+# CLIENT_ID = "test2_device"
+# PATH_TO_CERTIFICATE = "certs_test2/test2-certificate.pem.crt"
+# PATH_TO_PRIVATE_KEY = "certs_test2/test2-private.pem.key"
+# PATH_TO_AMAZON_ROOT_CA_1 = "certs_test2/AmazonRootCA1.pem"
+
+CLIENT_ID = "counterfit_off"
+PATH_TO_CERTIFICATE = "certs_off/counterfit_official-certificate.pem.crt"
+PATH_TO_PRIVATE_KEY = "certs_off/counterfit_official-private.pem.key"
+PATH_TO_AMAZON_ROOT_CA_1 = "certs_off/AmazonRootCA1.pem"
+
 URL = 'https://p5gwvdut5ljvhwsmn2bhxw7a740vktax.lambda-url.ap-southeast-1.on.aws/'
 
 iot_hub = IoTHub(
@@ -37,10 +42,8 @@ iot_hub.connect()
 adc = ADC()
 relay = GroveRelay(5)
 
-print(args.auto)
-
 try:
-    if args.auto:
+    if args.relay_control:
         print("Starting sensor and relay threads.")
         threading_relay = Thread(target=relay_thread, kwargs={"iot_hub": iot_hub, "sub_topic": SUB_TOPIC, "relay": relay}, daemon=True)
         threading_sensor = Thread(target=sensor_thread, kwargs={"iot_hub": iot_hub, "pub_topic": PUB_TOPIC, "sensor": adc}, daemon=True)

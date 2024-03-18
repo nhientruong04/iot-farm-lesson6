@@ -23,4 +23,4 @@ def relay_thread(iot_hub, sub_topic, relay):
     iot_hub.subscribe_cloud(sub_topic=sub_topic, on_message_handle=handle_telemetry)
 
     while True:
-        time.sleep(2)
+        time.sleep(5)

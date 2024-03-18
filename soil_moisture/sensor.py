@@ -6,4 +6,4 @@ def sensor_thread(iot_hub, pub_topic, sensor):
         payload = {"soil-moisture": soil_moisture}
         iot_hub.publish_cloud(payload, pub_topic)
 
-        time.sleep(2)
+        time.sleep(5)

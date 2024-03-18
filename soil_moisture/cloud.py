@@ -25,14 +25,14 @@ class IoTHub():
 	def subscribe_cloud(self, sub_topic, on_message_handle):
 		self.subscribe_future, _ =  self.mqtt_connection.subscribe(
 										topic=sub_topic,
-										qos=mqtt.QoS.AT_LEAST_ONCE,
+										qos=mqtt.QoS.AT_MOST_ONCE,
 										callback=on_message_handle)
 		print(f"Subscribed to topic {sub_topic}.")
 
 		return self.subscribe_future.result()
 
 	def publish_cloud(self, payload, topic):
-		self.mqtt_connection.publish(topic=topic, payload=json.dumps(payload), qos=mqtt.QoS.AT_LEAST_ONCE)
+		self.mqtt_connection.publish(topic=topic, payload=json.dumps(payload), qos=mqtt.QoS.AT_MOST_ONCE)
 		print("Published: '" + json.dumps(payload) + "' to the topic: " + topic)
 
 	def connect(self):
